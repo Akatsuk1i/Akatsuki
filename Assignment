@@ -1,69 +1,107 @@
 import tkinter as tk
 from tkinter import messagebox
 
-class BankApplication:
+
+class BankAccount:
+    def __init__(self, account_number, initial_balance=0.0):
+        self.account_number = account_number
+        self.balance = initial_balance
+
+    def deposit(self, amount):
+        if amount > 0:
+            self.balance += amount
+            messagebox.showinfo("Deposit", f"Deposited {amount:.2f} into account {self.account_number}")
+        else:
+            messagebox.showerror("Invalid Deposit", "Invalid amount for deposit")
+
+    def withdraw(self, amount):
+        if amount <= self.balance:
+            self.balance -= amount
+            messagebox.showinfo("Withdrawal", f"Withdrew {amount:.2f} from account {self.account_number}")
+        else:
+            messagebox.showerror("Insufficient Funds", "Insufficient funds")
+
+    def check_balance(self):
+        messagebox.showinfo("Account Balance", f"Account {self.account_number} balance: {self.balance:.2f}")
+
+
+class BankAppGUI:
     def __init__(self, root):
         self.root = root
-        self.root.title("Bank Application")
-        
-        self.savings_balance = 0
-        self.current_balance = 0
-        
-        self.savings_label = tk.Label(root, text="Savings Balance: $0")
-        self.savings_label.pack(pady=10)
-        
-        self.current_label = tk.Label(root, text="Current Balance: $0")
-        self.current_label.pack(pady=10)
-        
-        deposit_button = tk.Button(root, text="Deposit", command=self.deposit)
-        deposit_button.pack(pady=5)
-        
-        withdraw_button = tk.Button(root, text="Withdraw", command=self.withdraw)
-        withdraw_button.pack(pady=5)
-        
-        exit_button = tk.Button(root, text="Exit", command=root.destroy)
-        exit_button.pack(pady=5)
-        
-    def update_balance_labels(self):
-        self.savings_label.config(text="Savings Balance: ${}".format(self.savings_balance))
-        self.current_label.config(text="Current Balance: ${}".format(self.current_balance))
-        
-    def deposit(self):
-        account = tk.simpledialog.askstring("Deposit", "Enter account type (savings/current):")
-        if account.lower() == "savings":
-            amount = tk.simpledialog.askfloat("Deposit", "Enter deposit amount for savings account:")
-            if amount:
-                self.savings_balance += amount
-                self.update_balance_labels()
-        elif account.lower() == "current":
-            amount = tk.simpledialog.askfloat("Deposit", "Enter deposit amount for current account:")
-            if amount:
-                self.current_balance += amount
-                self.update_balance_labels()
-        else:
-            messagebox.showwarning("Invalid Account Type", "Please enter a valid account type (savings/current).")
-        
-    def withdraw(self):
-        account = tk.simpledialog.askstring("Withdraw", "Enter account type (savings/current):")
-        if account.lower() == "savings":
-            amount = tk.simpledialog.askfloat("Withdraw", "Enter withdrawal amount for savings account:")
-            if amount:
-                if self.savings_balance >= amount:
-                    self.savings_balance -= amount
-                    self.update_balance_labels()
-                else:
-                    messagebox.showwarning("Insufficient Balance", "You do not have enough savings balance.")
-        elif account.lower() == "current":
-            amount = tk.simpledialog.askfloat("Withdraw", "Enter withdrawal amount for current account:")
-            if amount:
-                if self.current_balance >= amount:
-                    self.current_balance -= amount
-                    self.update_balance_labels()
-                else:
-                    messagebox.showwarning("Insufficient Balance", "You do not have enough current balance.")
-        else:
-            messagebox.showwarning("Invalid Account Type", "Please enter a valid account type (savings/current).")
+        self.root.title("Bank App")
 
-root = tk.Tk()
-bank_app = BankApplication(root)
-root.mainloop()
+        self.accounts = {}
+
+        self.create_account_frame = tk.Frame(self.root)
+        self.create_account_frame.pack(pady=10)
+
+        tk.Label(self.create_account_frame, text="Account Number:").grid(row=0, column=0, padx=5, pady=5)
+        self.account_entry = tk.Entry(self.create_account_frame)
+        self.account_entry.grid(row=0, column=1, padx=5, pady=5)
+
+        tk.Label(self.create_account_frame, text="Initial Balance:").grid(row=1, column=0, padx=5, pady=5)
+        self.balance_entry = tk.Entry(self.create_account_frame)
+        self.balance_entry.grid(row=1, column=1, padx=5, pady=5)
+
+        self.create_account_btn = tk.Button(self.create_account_frame, text="Create Account", command=self.create_account)
+        self.create_account_btn.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
+
+        self.actions_frame = tk.Frame(self.root)
+        self.actions_frame.pack(pady=10)
+
+        tk.Label(self.actions_frame, text="Account Number:").grid(row=0, column=0, padx=5, pady=5)
+        self.account_choice = tk.StringVar()
+        self.account_dropdown = tk.OptionMenu(self.actions_frame, self.account_choice, "")
+        self.account_dropdown.grid(row=0, column=1, padx=5, pady=5)
+
+        tk.Label(self.actions_frame, text="Amount:").grid(row=1, column=0, padx=5, pady=5)
+        self.amount_entry = tk.Entry(self.actions_frame)
+        self.amount_entry.grid(row=1, column=1, padx=5, pady=5)
+
+        self.deposit_btn = tk.Button(self.actions_frame, text="Deposit", command=self.deposit)
+        self.deposit_btn.grid(row=2, column=0, padx=5, pady=5)
+
+        self.withdraw_btn = tk.Button(self.actions_frame, text="Withdraw", command=self.withdraw)
+        self.withdraw_btn.grid(row=2, column=1, padx=5, pady=5)
+
+        self.balance_btn = tk.Button(self.actions_frame, text="Check Balance", command=self.check_balance)
+        self.balance_btn.grid(row=3, column=0, columnspan=2, padx=5, pady=5)
+
+    def create_account(self):
+        account_number = self.account_entry.get()
+        initial_balance = float(self.balance_entry.get())
+        self.accounts[account_number] = BankAccount(account_number, initial_balance)
+        messagebox.showinfo("Account Creation", f"Account {account_number} created successfully")
+
+        self.account_dropdown['menu'].delete(0, 'end')  # Clear dropdown menu
+        for account in self.accounts:
+            self.account_dropdown['menu'].add_command(label=account, command=tk._setit(self.account_choice, account))
+
+    def deposit(self):
+        account_number = self.account_choice.get()
+        if account_number in self.accounts:
+            amount = float(self.amount_entry.get())
+            self.accounts[account_number].deposit(amount)
+        else:
+            messagebox.showerror("Account Not Found", "Account not found")
+
+    def withdraw(self):
+        account_number = self.account_choice.get()
+        if account_number in self.accounts:
+            amount = float(self.amount_entry.get())
+            self.accounts[account_number].withdraw(amount)
+        else:
+            messagebox.showerror("Account Not Found", "Account not found")
+
+    def check_balance(self):
+        account_number = self.account_choice.get()
+        if account_number in self.accounts:
+            self.accounts[account_number].check_balance()
+        else:
+            messagebox.showerror("Account Not Found", "Account not found")
+
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    bank_app_gui = BankAppGUI(root)
+    root.mainloop()

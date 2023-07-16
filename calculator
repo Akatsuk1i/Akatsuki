@@ -1,0 +1,72 @@
+import math
+
+class Calculator:
+    def __init__(self):
+        pass
+
+    def add(self, x, y):
+        return x + y
+
+    def subtract(self, x, y):
+        return x - y
+
+    def multiply(self, x, y):
+        return x * y
+
+    def divide(self, x, y):
+        if y != 0:
+            return x / y
+        else:
+            return "Error: Cannot divide by zero."
+
+    def square_root(self, x):
+        return math.sqrt(x)
+
+    def calculate_velocity(self, distance, time):
+        return distance / time
+
+# Example usage
+calculator = Calculator()
+
+print("=== Math and Physics Calculator ===")
+print("1. Add")
+print("2. Subtract")
+print("3. Multiply")
+print("4. Divide")
+print("5. Square Root")
+print("6. Calculate Velocity")
+
+while True:
+    choice = input("Enter your choice (1-6): ")
+
+    if choice == "1":
+        num1 = float(input("Enter the first number: "))
+        num2 = float(input("Enter the second number: "))
+        result = calculator.add(num1, num2)
+        print("Result:", result)
+    elif choice == "2":
+        num1 = float(input("Enter the first number: "))
+        num2 = float(input("Enter the second number: "))
+        result = calculator.subtract(num1, num2)
+        print("Result:", result)
+    elif choice == "3":
+        num1 = float(input("Enter the first number: "))
+        num2 = float(input("Enter the second number: "))
+        result = calculator.multiply(num1, num2)
+        print("Result:", result)
+    elif choice == "4":
+        num1 = float(input("Enter the first number: "))
+        num2 = float(input("Enter the second number: "))
+        result = calculator.divide(num1, num2)
+        print("Result:", result)
+    elif choice == "5":
+        num = float(input("Enter the number: "))
+        result = calculator.square_root(num)
+        print("Result:", result)
+    elif choice == "6":
+        distance = float(input("Enter the distance: "))
+        time = float(input("Enter the time: "))
+        result = calculator.calculate_velocity(distance, time)
+        print("Result:", result)
+    else:
+        print("Invalid choice. Please try again.")
